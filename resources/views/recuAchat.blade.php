@@ -1,13 +1,10 @@
-<?php 
-    include("entete.php");
+@extends('layouts.app')
 
-    if (!empty($_GET["id"])) {
-        $achats = getAchat($_GET["id"]);
-        $achat_lignes = getAchatLignes($_GET["id"]);
-    }
-?>
+@section('title', 'Recu Achat - MonStock')
+@section('page-title', 'Recu Achat')
 
-<div class="home-content">
+@section('content')
+
 
         <button class="hidden-print" id="btnPrint" style="position:relative; left:42%;"><i class='bx bx-printer' ></i> Imprimer</button>
 
@@ -84,13 +81,9 @@
         </table>
     </div>
     
-</div>
+@endsection
 
-</section>
-
-<?php 
-    include("pied.php");
-?>
+@section('scripts')
 
 <script>
     var btnPrint =document.querySelector("#btnPrint");
@@ -100,3 +93,5 @@
 
     
 </script>
+
+@endsection

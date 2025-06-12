@@ -1,12 +1,11 @@
-<?php 
-    include("entete.php");
+@extends('layouts.app')
 
-    if (!empty($_GET["id"])) {
-        $fournisseur = getFournisseur($_GET["id"]);
-    }
-?>
+@section('title', 'Fournisseur - MonStock')
+@section('page-title', 'Fournisseur')
 
-<div class="home-content">
+@section('content')
+
+
     <div class="overview-boxes">
         <div class="vabox">
             <form action=" <?= !empty($_GET["id"]) ? "../model/modifFournisseur.php" : "../model/ajoutFournisseur.php" ?>" method="post">
@@ -101,13 +100,11 @@
             </table>
         </div>
     </div>
-</div>
 
-</section>
 
-<?php 
-    include("pied.php");
-?>
+@endsection
+
+@section('scripts')
 
 <script>
     function supprimeFournisseur(idFournisseur) {
@@ -196,3 +193,5 @@
     });
 });
 </script>
+
+@endsection

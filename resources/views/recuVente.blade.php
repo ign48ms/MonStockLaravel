@@ -1,13 +1,10 @@
-<?php 
-    include("entete.php");
+@extends('layouts.app')
 
-    if (!empty($_GET["id"])) {
-        $ventes = getVente($_GET["id"]);
-        $vente_lignes = getVenteLignes($_GET["id"]);
-    }
-?>
+@section('title', 'Recu Vente - MonStock')
+@section('page-title', 'Recu Vente')
 
-<div class="home-content">
+@section('content')
+
 
         <button class="hidden-print" id="btnPrint" style="position:relative; left:42%;"><i class='bx bx-printer' ></i> Imprimer</button>
 
@@ -81,13 +78,9 @@
         </table>
     </div>
     
-</div>
+@endsection
 
-</section>
-
-<?php 
-    include("pied.php");
-?>
+@section('scripts')
 
 <script>
     var btnPrint =document.querySelector("#btnPrint");
@@ -97,3 +90,5 @@
 
     
 </script>
+
+@endsection

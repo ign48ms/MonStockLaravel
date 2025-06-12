@@ -1,12 +1,10 @@
-<?php 
-    include("entete.php");
+@extends('layouts.app')
 
-    if (!empty($_GET["id"])) {
-        $client = getClient($_GET["id"]);
-    }
-?>
+@section('title', 'Client - MonStock')
+@section('page-title', 'Client')
 
-<div class="home-content">
+@section('content')
+
     <div class="overview-boxes">
         <div class="vabox">
             <form action=" <?= !empty($_GET["id"]) ? "../model/modifClient.php" : "../model/ajoutClient.php" ?>" method="post">
@@ -102,14 +100,11 @@
             </table>
         </div>
     </div>
-</div>
 
-</section>
 
-<?php 
-    include("pied.php");
-?>
+@endsection
 
+@section('scripts')
 
 <script>
     function supprimeClient(idClient) {
@@ -198,3 +193,5 @@
     });
 });
 </script>
+
+@endsection

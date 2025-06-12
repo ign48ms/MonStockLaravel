@@ -1,12 +1,11 @@
-<?php 
-    include("entete.php");
+@extends('layouts.app')
 
-    if (!empty($_GET["id"])) {
-        $article = getArticle($_GET["id"]);
-    }
-?>
+@section('title', 'Article - MonStock')
+@section('page-title', 'Article')
 
-<div class="home-content">
+@section('content')
+
+
     <div class="overview-boxes">
         <div class="vabox">
             <form action=" <?= !empty($_GET["id"]) ? "../model/modifArticle.php" : "../model/ajoutArticle.php" ?>" method="post">
@@ -163,13 +162,11 @@
             </table>
         </div>
     </div>
-</div>
 
-</section>
 
-<?php 
-    include("pied.php");
-?>
+@endsection
+
+@section('scripts')
 
 <script>
     function supprimeArticle(idArticle) {
@@ -257,3 +254,5 @@
     });
 });
 </script>
+
+@endsection

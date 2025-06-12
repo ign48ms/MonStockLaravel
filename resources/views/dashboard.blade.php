@@ -1,7 +1,10 @@
-<?php
-    include("entete.php");
-?>
-<div class="home-content">
+@extends('layouts.app')
+
+@section('title', 'Dashboard - MonStock')
+@section('page-title', 'Dashboard')
+
+@section('content')
+
         <div class="overview-boxes">
           <div class="box">
             <div class="right-side">
@@ -111,8 +114,5 @@
             </ul>
           </div>
         </div>
-      </div>
-    </section>
-<?php
-    include("pied.php");
-?>
+    
+@endsection

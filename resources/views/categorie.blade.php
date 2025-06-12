@@ -1,12 +1,10 @@
-<?php 
-    include("entete.php");
+@extends('layouts.app')
 
-    if (!empty($_GET["id"])) {
-        $categorie = getCategorie($_GET["id"]);
-    }
-?>
+@section('title', 'Catégorie - MonStock')
+@section('page-title', 'Catégorie')
 
-<div class="home-content">
+@section('content')
+
     <div class="overview-boxes">
         <div class="vabox">
             <form action=" <?= !empty($_GET["id"]) ? "../model/modifCategorie.php" : "../model/ajoutCategorie.php" ?>" method="post">
@@ -55,13 +53,10 @@
             </table>
         </div>
     </div>
-</div>
 
-</section>
+@endsection
 
-<?php 
-    include("pied.php");
-?>
+@section('scripts')
 
 <script>
     function supprimeCategorie(idCategorie) {
@@ -71,3 +66,5 @@
     }
 }
 </script>
+
+@endsection

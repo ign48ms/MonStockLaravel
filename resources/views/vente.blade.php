@@ -1,12 +1,11 @@
-<?php 
-    include("entete.php");
+@extends('layouts.app')
 
-    if (!empty($_GET["id_vente"])) {
-        $article = getVente($_GET["id_vente"]);
-    }
-?>
+@section('title', 'Vente - MonStock')
+@section('page-title', 'Vente')
 
-<div class="home-content">
+@section('content')
+
+
     <?php if (empty($_GET["id_vente"])): ?>
         <button onclick="createNewVente()" class="valider" style="margin-left: 25px; margin-bottom: 5px;">Nouveau Vente</button>
     <?php endif; ?>    
@@ -244,14 +243,11 @@
             </div>
             <?php endif; ?>
         </div>
-    </div>
-</div>
 
-</section>
 
-<?php 
-    include("pied.php");
-?>
+@endsection
+
+@section('scripts')
 
 <script>
 
@@ -376,3 +372,5 @@
 });
 
 </script>
+
+@endsection

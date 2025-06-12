@@ -1,19 +1,22 @@
 <?php
-include("connexionbd.php");
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+use Illuminate\Support\Facades\DB;
+
+// Helper function to get Laravel's PDO connection
+function getDbConnection() {
+    return DB::connection()->getPdo();
+}
 
 function getArticle($id=null, $DONNErecherche = array()) {
+    $connexion = getDbConnection();
+    
     if (!empty($id)) {
         $sql = "SELECT nom_article, libelle_categorie, quantite, prix_vente_unitaire, prix_achat_unitaire, date_fabrication,
         date_expiration, id_categorie, a.id FROM article AS a, categorie_article AS c
         WHERE a.id_categorie = c.id AND a.id=? AND a.etat=?";
 
-        $req = $GLOBALS["connexion"]->prepare($sql);
-
+        $req = $connexion->prepare($sql);
         $req->execute(array($id,1));
-
         return $req->fetch();
 
     } elseif (!empty($DONNErecherche)) {
@@ -22,10 +25,8 @@ function getArticle($id=null, $DONNErecherche = array()) {
         if (!empty($nom_article)) $recherche .= "AND a.nom_article LIKE '%$nom_article%' ";
         if (!empty($id_categorie)) $recherche .= " AND a.id_categorie = $id_categorie ";
         if (!empty($quantite)) $recherche .= " AND a.quantite = $quantite ";
-
         if (!empty($prix_vente_unitaire)) $recherche .= " AND a.prix_vente_unitaire = $prix_vente_unitaire ";
         if (!empty($prix_achat_unitaire)) $recherche .= " AND a.prix_achat_unitaire = $prix_achat_unitaire ";
-
         if (!empty($date_fabrication)) $recherche .= " AND DATE(a.date_fabrication) = '$date_fabrication' ";
         if (!empty($date_expiration)) $recherche .= " AND DATE(a.date_expiration) = '$date_expiration' ";
 
@@ -33,33 +34,27 @@ function getArticle($id=null, $DONNErecherche = array()) {
         date_expiration, id_categorie, a.id FROM article AS a, categorie_article AS c
         WHERE a.id_categorie = c.id $recherche";
 
-        $req = $GLOBALS["connexion"]->prepare($sql);
-
+        $req = $connexion->prepare($sql);
         $req->execute();
-
         return $req->fetchAll();
     } else {
         $sql = "SELECT nom_article, libelle_categorie, quantite, prix_vente_unitaire, prix_achat_unitaire, date_fabrication,
         date_expiration, id_categorie, a.id FROM article AS a, categorie_article AS c
         WHERE a.id_categorie = c.id AND a.etat=?";
 
-        $req = $GLOBALS["connexion"]->prepare($sql);
-
+        $req = $connexion->prepare($sql);
         $req->execute(array(1));
-
         return $req->fetchAll();
     }
-    
 }
 
 function getClient($id=null, $DONNErecherche = array()) {
+    $connexion = getDbConnection();
+    
     if (!empty($id)) {
         $sql = "SELECT * FROM client WHERE id=? AND etat=?";
-
-        $req = $GLOBALS["connexion"]->prepare($sql);
-
+        $req = $connexion->prepare($sql);
         $req->execute(array($id,1));
-
         return $req->fetch();
 
     } elseif(!empty($DONNErecherche)) {
@@ -71,33 +66,26 @@ function getClient($id=null, $DONNErecherche = array()) {
         if (!empty($adresse)) $recherche .= "AND adresse LIKE '%$adresse%' ";
 
         $sql = "SELECT * FROM client WHERE etat='1' $recherche";
-
-        $req = $GLOBALS["connexion"]->prepare($sql);
-
+        $req = $connexion->prepare($sql);
         $req->execute();
-
         return $req->fetchAll();
     } else {
         $sql = "SELECT * FROM client WHERE etat=?";
-
-        $req = $GLOBALS["connexion"]->prepare($sql);
-
+        $req = $connexion->prepare($sql);
         $req->execute(array(1));
-
         return $req->fetchAll();
     }
-    
 }
 
 function getVente($id=null, $DONNErecherche = array()) {
+    $connexion = getDbConnection();
+    
     if (!empty($id)) {
         $sql = "SELECT v.id, nom, prenom, total, date_vente, adresse, telephone
          FROM client AS c, vente AS v WHERE v.id_client=c.id AND v.id=? AND v.etat=? ORDER BY v.date_vente ASC";
 
-        $req = $GLOBALS["connexion"]->prepare($sql);
-
+        $req = $connexion->prepare($sql);
         $req->execute(array($id,1));
-
         return $req->fetch();
 
     } elseif (!empty($DONNErecherche)) {
@@ -150,29 +138,26 @@ function getVente($id=null, $DONNErecherche = array()) {
                 FROM client AS c, vente AS v
                 WHERE v.id_client = c.id AND v.etat = ?" . $recherche . " ORDER BY v.date_vente ASC";
         
-        $req = $GLOBALS["connexion"]->prepare($sql);
+        $req = $connexion->prepare($sql);
         $req->execute($params);
         return $req->fetchAll();
     } else {   
         $sql = "SELECT v.id, nom, prenom, total, date_vente
                 FROM client AS c, vente AS v WHERE v.id_client=c.id AND v.etat=? ORDER BY v.date_vente ASC";
 
-        $req = $GLOBALS["connexion"]->prepare($sql);
-
+        $req = $connexion->prepare($sql);
         $req->execute(array(1));
-
         return $req->fetchAll();
     }
 }
 
 function getFournisseur($id=null, $DONNErecherche = array()) {
+    $connexion = getDbConnection();
+    
     if (!empty($id)) {
         $sql = "SELECT * FROM fournisseur WHERE id=? AND etat=?";
-
-        $req = $GLOBALS["connexion"]->prepare($sql);
-
+        $req = $connexion->prepare($sql);
         $req->execute(array($id,1));
-
         return $req->fetch();
 
     } elseif(!empty($DONNErecherche)) {
@@ -184,34 +169,27 @@ function getFournisseur($id=null, $DONNErecherche = array()) {
         if (!empty($adresse)) $recherche .= "AND adresse LIKE '%$adresse%' ";
 
         $sql = "SELECT * FROM fournisseur WHERE etat='1' $recherche";
-
-        $req = $GLOBALS["connexion"]->prepare($sql);
-
+        $req = $connexion->prepare($sql);
         $req->execute();
-
         return $req->fetchAll(); 
 
     } else {
         $sql = "SELECT * FROM fournisseur WHERE etat=?";
-
-        $req = $GLOBALS["connexion"]->prepare($sql);
-
+        $req = $connexion->prepare($sql);
         $req->execute(array(1));
-
         return $req->fetchAll();
     }
-    
 }
 
 function getAchat($id=null, $DONNErecherche = array()) {
+    $connexion = getDbConnection();
+    
     if (!empty($id)) {
         $sql = "SELECT a.id, nom, prenom, total, date_achat, adresse, telephone
          FROM fournisseur AS f, achat AS a WHERE a.id_fournisseur=f.id AND a.id=? AND a.etat=? ORDER BY a.date_achat ASC";
 
-        $req = $GLOBALS["connexion"]->prepare($sql);
-
+        $req = $connexion->prepare($sql);
         $req->execute(array($id,1));
-
         return $req->fetch();
 
     } elseif (!empty($DONNErecherche)) {
@@ -264,129 +242,110 @@ function getAchat($id=null, $DONNErecherche = array()) {
                 FROM fournisseur AS f, achat AS a
                 WHERE a.id_fournisseur = f.id AND a.etat = ?" . $recherche . " ORDER BY a.date_achat ASC";
         
-        $req = $GLOBALS["connexion"]->prepare($sql);
+        $req = $connexion->prepare($sql);
         $req->execute($params);
         return $req->fetchAll();
     } else {
         $sql = "SELECT a.id, nom, prenom, total, date_achat
                 FROM fournisseur AS f, achat AS a WHERE a.id_fournisseur=f.id AND a.etat=? ORDER BY a.date_achat ASC";
 
-        $req = $GLOBALS["connexion"]->prepare($sql);
-
+        $req = $connexion->prepare($sql);
         $req->execute(array(1));
-
         return $req->fetchAll();
     }
 }
 
 function getAllAchat() {
+    $connexion = getDbConnection();
     $sql = "SELECT COUNT(*) AS nbre FROM achat WHERE etat=?";
-    $req = $GLOBALS["connexion"]->prepare($sql);
-
-        $req->execute(array(1));
-
-        return $req->fetch();
+    $req = $connexion->prepare($sql);
+    $req->execute(array(1));
+    return $req->fetch();
 }
 
 function getAllVente() {
+    $connexion = getDbConnection();
     $sql = "SELECT COUNT(*) AS nbre FROM vente WHERE etat=?";
-    $req = $GLOBALS["connexion"]->prepare($sql);
-
-        $req->execute(array(1));
-
-        return $req->fetch();
+    $req = $connexion->prepare($sql);
+    $req->execute(array(1));
+    return $req->fetch();
 }
 
 function getAllArticle() {
+    $connexion = getDbConnection();
     $sql = "SELECT COUNT(*) AS nbre FROM article";
-    $req = $GLOBALS["connexion"]->prepare($sql);
-
-        $req->execute();
-
-        return $req->fetch();
+    $req = $connexion->prepare($sql);
+    $req->execute();
+    return $req->fetch();
 }
 
 function getCA() {
+    $connexion = getDbConnection();
     $sql = "SELECT SUM(total) AS total FROM vente";
-    $req = $GLOBALS["connexion"]->prepare($sql);
-
-        $req->execute();
-
-        return $req->fetch();
+    $req = $connexion->prepare($sql);
+    $req->execute();
+    return $req->fetch();
 }
 
 function getLastVente($id = null) {
+    $connexion = getDbConnection();
     $sql = "SELECT v.id, nom, prenom, total, date_vente
             FROM vente v, client c WHERE v.id_client = c.id AND v.etat = ? ORDER BY date_vente DESC LIMIT 10 "; 
             
-    $req = $GLOBALS["connexion"]->prepare($sql);
+    $req = $connexion->prepare($sql);
     $req->execute([1]);
-
     return $req->fetchAll();
 }
 
-
-
 function getMostVente($id=null) {
+    $connexion = getDbConnection();
     $sql = "SELECT a.nom_article, SUM(vl.prix) AS prix
             FROM vente v, vente_ligne vl, article a WHERE v.id = vl.id_vente AND vl.id_article = a.id AND v.etat = ?
             GROUP BY a.id, a.nom_article ORDER BY prix DESC LIMIT 10";
 
-
-    $req = $GLOBALS["connexion"]->prepare($sql);
+    $req = $connexion->prepare($sql);
     $req->execute([1]);
-
     return $req->fetchAll();
 }
 
-
 function getCategorie($id=null) {
+    $connexion = getDbConnection();
+    
     if (!empty($id)) {
         $sql = "SELECT * FROM categorie_article WHERE id=? AND etat=?";
-
-        $req = $GLOBALS["connexion"]->prepare($sql);
-
+        $req = $connexion->prepare($sql);
         $req->execute(array($id, 1));
-
         return $req->fetch();
-
     } else {
         $sql = "SELECT * FROM categorie_article WHERE etat=?";
-
-        $req = $GLOBALS["connexion"]->prepare($sql);
-
+        $req = $connexion->prepare($sql);
         $req->execute(array(1));
-
         return $req->fetchAll();
     }
-    
 }
 
 function getVenteLignes($idVente) {
-    global $connexion;
+    $connexion = getDbConnection();
     $sql = "SELECT vl.*, a.nom_article, a.prix_vente_unitaire
             FROM vente_ligne vl, article a WHERE vl.id_article = a.id AND vl.id_vente = ? ORDER BY vl.id ASC";
   
     $req = $connexion->prepare($sql);
     $req->execute([$idVente]);
-
     return $req->fetchAll(PDO::FETCH_ASSOC);
 }
 
-
 function getAchatLignes($idAchat) {
-    global $connexion;
+    $connexion = getDbConnection();
     $sql = "SELECT al.*, a.nom_article, a.prix_achat_unitaire
             FROM achat_ligne al, article a WHERE al.id_article = a.id AND al.id_achat = ? ORDER BY al.id ASC";
 
     $req = $connexion->prepare($sql);
     $req->execute([$idAchat]);
-
     return $req->fetchAll(PDO::FETCH_ASSOC);
 }
 
 function LowStock(){
-    global $connexion;
+    $connexion = getDbConnection();
     $sql = "SELECT COUNT(*) as nb FROM article WHERE quantite < 5";
     $req = $connexion->query($sql);
     $res = $req->fetch();

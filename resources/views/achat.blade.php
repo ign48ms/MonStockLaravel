@@ -1,12 +1,11 @@
-<?php 
-    include("entete.php");
+@extends('layouts.app')
 
-    if (!empty($_GET["id_achat"])) {
-        $article = getAchat($_GET["id_achat"]);
-    }
-?>
+@section('title', 'Achat - MonStock')
+@section('page-title', 'Achat')
 
-<div class="home-content">
+@section('content')
+
+
     <?php if (empty($_GET["id_achat"])): ?>
         <button onclick="createNewAchat()" class="valider" style="margin-left: 25px; margin-bottom: 5px;">Nouveau Achat</button>
     <?php endif; ?>  
@@ -208,15 +207,12 @@
         </div>
         <?php endif; ?>
     </div>
-</div>
 
-</div>
 
-</section>
 
-<?php 
-    include("pied.php");
-?>
+@endsection
+
+ @section('scripts')
 
 <script>
     function createNewAchat() {
@@ -338,3 +334,5 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
+@endsection
