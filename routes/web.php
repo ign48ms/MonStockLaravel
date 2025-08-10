@@ -1,26 +1,15 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\DB;
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
+use App\Http\Controllers\ArticleController;
 
-Route::get('/test-db', function () {
-    try {
-        $pdo = DB::connection()->getPdo();
-        return "Database connection successful!";
-    } catch (\Exception $e) {
-        return "Database connection failed: " . $e->getMessage();
-    }
-});
+
+// Article routes
+Route::get('/article', [ArticleController::class, 'index'])->name('article');
+Route::post('/article/store', [ArticleController::class, 'store'])->name('article.store');
+Route::post('/article/update', [ArticleController::class, 'update'])->name('article.update');
+Route::get('/article/delete', [ArticleController::class, 'destroy'])->name('article.delete');
+
 
 Route::get('/', function () {
     require_once app_path('Legacy/function.php');
@@ -52,11 +41,6 @@ Route::get('/fournisseur', function () {
     require_once app_path('Legacy/function.php');
     return view('fournisseur');
 })->name('fournisseur');
-
-Route::get('/article', function () {
-    require_once app_path('Legacy/function.php');
-    return view('article');
-})->name('article');
 
 Route::get('/categorie', function () {
     require_once app_path('Legacy/function.php');

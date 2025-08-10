@@ -8,62 +8,84 @@
 
     <div class="overview-boxes">
         <div class="vabox">
-            <form action=" <?= !empty($_GET["id"]) ? "../model/modifArticle.php" : "../model/ajoutArticle.php" ?>" method="post">
-                <h3><?= !empty($_GET["id"]) ? "Modifier Article" : "Ajouter un Article" ?></h3>
+
+            <form action="{{ $article ? route('article.update') : route('article.store') }}" method="post">
+
+                @csrf
+
+                <h3>{{ $article ? 'Modifier Article' : 'Ajouter Article' }}</h3>
+
+                @if ($article)
+                    <input type="hidden" name="id" value="{{ $article->id }}">
+                @endif
+
+
                 <label for="nom_article">Nom de l'article</label>
-                <input value="<?= !empty($_GET["id"]) ? $article["nom_article"] : "" ?>" type="text" name="nom_article" id="nom_article" placeholder="Veuillez saisir le nom">
-                <input value="<?= !empty($_GET["id"]) ? $article["id"] : "" ?>" type="hidden" name="id" id="id">
+                <input value="{{ $article->nom_article ?? old('nom_article') }}" type="text" name="nom_article" id="nom_article" placeholder="Veuillez saisir le nom" required>
+
 
                 <label for="id_categorie">Catégorie</label>
-                <select name="id_categorie" id="id_categorie" class="tom-select">
+                <select name="id_categorie" id="id_categorie" class="tom-select" required>
                     <option value="" disabled selected>Choisir une Catégorie</option>
-                    <?php 
-                    $categories = getCategorie();
-                    if (!empty($categories) && is_array($categories)) {
-                        foreach($categories as $key => $value){
-
-                    ?>
-                        <option <?= !empty($_GET["id"]) && $article["id_categorie"]== $value['id'] ? "selected" : "" ?> value="<?= $value["id"] ?>"><?= $value['libelle_categorie'] ?></option>                
-                    
-                    <?php 
-
-                        }
-                    }
-                    ?>
+                    @foreach ($categories as $categorie)
+                        <option value="{{ $categorie->id }}" 
+                                {{ ($article && $article->id_categorie == $categorie->id) || old('id_categorie') == $categorie->id ? 'selected' : '' }}>
+                                {{ $categorie->libelle_categorie }}
+                        </option>
+                    @endforeach
                 </select>
 
+
                 <label for="quantite">Quantité</label>
-                <input value="<?= !empty($_GET["id"]) ? $article["quantite"] : "" ?>" type="number" name="quantite" id="quantite" placeholder="Veuillez saisir la quantité" min="0">
+                <input value="{{ $article->quantite ?? old('quantite') }}" type="number" name="quantite" id="quantite" placeholder="Veuillez saisir la quantité" min="0">
+
 
                 <label for="prix_vente_unitaire">Prix de vente unitaire</label>
-                <input value="<?= !empty($_GET["id"]) ? $article["prix_vente_unitaire"] : "" ?>" type="number" name="prix_vente_unitaire" id="prix_vente_unitaire" placeholder="Veuillez saisir le prix" min="0" step="any">
+                <input value="{{ $article->prix_vente_unitaire ?? old('prix_vente_unitaire') }}" type="number" name="prix_vente_unitaire" id="prix_vente_unitaire" placeholder="Veuillez saisir le prix" min="0" step="any">
+
 
                 <label for="prix_achat_unitaire">Prix d'achat unitaire</label>
-                <input value="<?= !empty($_GET["id"]) ? $article["prix_achat_unitaire"] : "" ?>" type="number" name="prix_achat_unitaire" id="prix_achat_unitaire" placeholder="Veuillez saisir le prix" min="0" step="any">
+                <input value="{{ $article->prix_achat_unitaire ?? old('prix_achat_unitaire') }}" type="number" name="prix_achat_unitaire" id="prix_achat_unitaire" placeholder="Veuillez saisir le prix" min="0" step="any">
+
 
                 <label for="date_fabrication">Date de fabrication</label>
-                <input value="<?= !empty($_GET["id"]) ? $article["date_fabrication"] : "" ?>" type="datetime-local" name="date_fabrication" id="date_fabrication">
+                <input value="{{ $article ? \Carbon\Carbon::parse($article->date_fabrication)->format('Y-m-d\TH:i') : old('date_fabrication') }}" type="datetime-local" name="date_fabrication" id="date_fabrication">
+
 
                 <label for="date_expiration">Date d'expiration</label>
-                <input value="<?= !empty($_GET["id"]) ? $article["date_expiration"] : "" ?>" type="datetime-local" name="date_expiration" id="date_expiration">
+                <input value="{{ $article ? \Carbon\Carbon::parse($article->date_expiration)->format('Y-m-d\TH:i') : old('date_expiration') }}" type="datetime-local" name="date_expiration" id="date_expiration">
+
 
                 <button type="submit">Valider</button>
                 
-                <?php
-                if (!empty($_SESSION["message"]["text"])) {
-                ?>
-                    <div class="alert <?=$_SESSION["message"]["type"]?>">
-                        <?=$_SESSION["message"]["text"]?>
+                {{-- Display success/error messages --}}
+                @if(session('success'))
+                    <div class="alert success">
+                        {{ session('success') }}
                     </div>
-                <?php 
-                unset($_SESSION["message"]); // Efface le message après affichage
-                }
-                ?>
+                @endif
+                
+                @if(session('error'))
+                    <div class="alert error">
+                        {{ session('error') }}
+                    </div>
+                @endif
+                
+                {{-- Display validation errors --}}
+                @if ($errors->any())
+                    <div class="alert error">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
             </form>
         </div>
         <div style="display: block;" class="box">
-            <form action="" method="get">
+            <form action="{{ route('article') }}" method="get">
                 <table class="mtable">
                     <tr>
                         <th>Nom article</th>
@@ -76,47 +98,46 @@
                     </tr>
                     <tr>
                         <td>
-                            <input type="text" name="nom_article" id="nom_article" placeholder="Veuillez saisir le nom">
+                            <input type="text" name="nom_article" id="nom_article" placeholder="Veuillez saisir le nom" value="{{ request('nom_article') }}">
                         </td>
                         <td>
                             <select name="id_categorie" id="id_categorie" class="tom-select">
                                 <option value="" disabled selected>---Choisir---</option>
-                                <?php 
-                                $categories = getCategorie();
-                                if (!empty($categories) && is_array($categories)) {
-                                    foreach($categories as $key => $value){
-
-                                ?>
-                                    <option <?= !empty($_GET["id"]) && $article["id_categorie"]== $value['id'] ? "selected" : "" ?> value="<?= $value["id"] ?>"><?= $value['libelle_categorie'] ?></option>                
-                                
-                                <?php 
-
-                                    }
-                                }
-                                ?>
+                                @foreach ($categories as $categorie)
+                                    <option value="{{ $categorie->id }}" {{ request('id_categorie') == $categorie->id ? 'selected': '' }}>
+                                        {{ $categorie->libelle_categorie }}
+                                    </option>
+                                @endforeach
                             </select>
                         </td>
-                        <td>
-                            <input type="number" name="quantite" id="quantite" placeholder="Veuillez saisir la quantité" min="0">
+                         <td>
+                            <input type="number" name="quantite" value="{{ request('quantite') }}" 
+                                placeholder="Quantité" min="0">
                         </td>
                         <td>
-                            <input type="number" name="prix_vente_unitaire" id="prix_vente_unitaire" placeholder="Veuillez saisir le prix" min="0" step="any">
+                            <input type="number" name="prix_vente_unitaire" value="{{ request('prix_vente_unitaire') }}" 
+                                placeholder="Prix de vente" min="0" step="any">
                         </td>
                         <td>
-                            <input type="number" name="prix_achat_unitaire" id="prix_achat_unitaire" placeholder="Veuillez saisir le prix" min="0" step="any">
+                            <input type="number" name="prix_achat_unitaire" value="{{ request('prix_achat_unitaire') }}" 
+                                placeholder="Prix d'achat" min="0" step="any">
                         </td>
                         <td>
-                            <input type="date" name="date_fabrication" id="date_fabrication">
+                            <input type="date" name="date_fabrication" value="{{ request('date_fabrication') }}">
                         </td>
                         <td>
-                            <input type="date" name="date_expiration" id="date_expiration">
+                            <input type="date" name="date_expiration" value="{{ request('date_expiration') }}">
                         </td>
                     </tr>
                 </table>
+
                 <br>
+
                 <button type="submit">Recherche</button>
             </form>
+
             <br>
+
             <table class="mtable">
                 <tr>
                     <th class="sortable" data-sort="nom">Nom article<span class="sort-icon"></span></th>
@@ -128,37 +149,31 @@
                     <th class="sortable" data-sort="date">Date expiration<span class="sort-icon"></span></th>
                     <th>Action</th>
                 </tr>
-                <?php
-                if (!empty($_GET)) {
-                    $articles = getArticle(null, $_GET);
-                } else {
-                    $articles = getArticle();
-                }
-                
-
-                
-                if (!empty($articles) && is_array( $articles )) {
-                    foreach ($articles as $key => $value) {    
-                        // Check si quantite < 5
-                        $lowStockClass = ($value["quantite"] < 5) ? 'low-stock-row' : '';
-                ?>
-                    <tr class="<?= $lowStockClass ?>">
-                        <td><?=$value["nom_article"]?></td>
-                        <td><?=$value["libelle_categorie"]?></td>
-                        <td><?=$value["quantite"]?></td>
-                        <td><?=number_format($value["prix_vente_unitaire"],2,".","")?></td>
-                        <td><?=number_format($value["prix_achat_unitaire"],2,".","")?></td>
-                        <td><?=date("d/m/Y H:i:s",strtotime($value["date_fabrication"]))?></td>
-                        <td><?=date("d/m/Y H:i:s",strtotime($value["date_expiration"]))?></td>
+                @forelse($articles as $articleItem)
+                    <tr class="{{ $articleItem->quantite < 5 ? 'low-stock-row' : '' }}">
+                        <td>{{ $articleItem->nom_article }}</td>
+                        <td>{{ $articleItem->categorie->libelle_categorie ?? 'N/A' }}</td>
+                        <td>{{ $articleItem->quantite }}</td>
+                        <td>{{ number_format($articleItem->prix_vente_unitaire, 2) }}</td>
+                        <td>{{ number_format($articleItem->prix_achat_unitaire, 2) }}</td>
+                        <td>{{ \Carbon\Carbon::parse($articleItem->date_fabrication)->format('d/m/Y H:i:s') }}</td>
+                        <td>{{ \Carbon\Carbon::parse($articleItem->date_expiration)->format('d/m/Y H:i:s') }}</td>
                         <td>
-                            <a href="?id=<?=$value["id"]?>" title="Modifier" style="color: blue !important;"><i class='bx bx-edit-alt'></i></a>
-                            <a onclick="supprimeArticle(<?= $value['id']?>)" title="Supprimer" style="color: red; cursor: pointer;"><i class='bx bx-x-circle'></i></a>
+                            <a href="{{ route('article', ['id' => $articleItem->id]) }}" 
+                            title="Modifier" style="color: blue !important;">
+                                <i class='bx bx-edit-alt'></i>
+                            </a>
+                            <a onclick="supprimeArticle({{ $articleItem->id }})" 
+                            title="Supprimer" style="color: red; cursor: pointer;">
+                                <i class='bx bx-x-circle'></i>
+                            </a>
                         </td>
-                    </tr>    
-                <?php
-                    }
-                }
-                ?>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="8" style="text-align: center;">Aucun article trouvé</td>
+                    </tr>
+                @endforelse
             </table>
         </div>
     </div>
@@ -172,7 +187,7 @@
     function supprimeArticle(idArticle) {
 
     if (confirm("Voulez-vous vraiment supprimer ce article?")) {
-        window.location.href = `../model/supprimeArticle.php?idArticle=${idArticle}`;
+        window.location.href = `{{ route('article.delete') }}?idArticle=${idArticle}`;
     }
 }
 // Updated JavaScript that changes the sort icon content directly
